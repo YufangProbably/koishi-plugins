@@ -1,5 +1,5 @@
 {
-  "name": "@adminyf/koishi-plugin-whatlang",
+  "name": "koishi-plugin-whatlang",
   "description": "what?",
   "version": "0.0.2",
   "main": "lib/index.js",
