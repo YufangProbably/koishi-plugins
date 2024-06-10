@@ -20,7 +20,7 @@ const help_record : Record<string, string> = ({
         `暂且可以理解为 eval 和 map 罢。`
         `    @ 弹出，若该字符串为内置函数名则执行，_`
         `否则若该字符串为变量名则将该变量值以 WhatLang 运行，_`
-        `否则将该值以 WhatLang 运行。（语言显然是 WhatLang）`
+        `否则将该值以 WhatLang 运行`
         `    # 弹出，对于栈顶中的每个元素，_`
         `复制当前栈，压入该元素，并对该值运行 @ 指令，_`
         `返回复制栈的栈顶构成的数组`
@@ -35,7 +35,7 @@ const help_record : Record<string, string> = ({
         `    , 弹出一值，返回 栈顶[该值]`
         `    ; 弹出二值，并 栈顶[底值] = 顶值；_`
         `特别地，当底值为 NaN 或 undefined 时，默认为数组长度。`
-        `    $ 弹出一值，并 栈顶.splice(底值, 1)。`
+        `    $ 弹出一值，并 栈顶.splice(该值, 1)。`
     ()),
     ".": (S
         `输出栈顶。`
@@ -54,8 +54,8 @@ const help_record : Record<string, string> = ({
     ()),
     "= ^": (S
         `变量操作之类的。不想要 v ^ 也不想要 = $ 然后选了这两坨。`
-        `    = 弹出二值，将底值赋值给名为[顶值]的变量`
-        `    ^ 弹出，返回名为[顶值]的变量`
+        `    = 弹出，将栈顶值赋值给名为(该值)的变量`
+        `    ^ 弹出，返回名为(该值)的变量`
     ()),
     "?": (S
         `如果你有看到过 <=> 的话，这就是了，如果没有的话——`
@@ -149,6 +149,13 @@ const help_record : Record<string, string> = ({
         `    repl 弹出三值，返回 底值.replace(中值, 顶值)`
         `    reesc 弹出，对其进行正则转义并返回。`
     ()),
+    "time" : (S
+        `返回当前时间戳。`
+    ()),
+    "type" : (S
+        `弹出，返回 该值.constructor.name。`
+        `为什么不用typeof呢？`
+    ()),
     "help helpall" : (S
         `……？`
     ()),
@@ -157,13 +164,13 @@ const help_record : Record<string, string> = ({
         `    pr 大致上是 (me@1, propt@ 0,)@ 的缩写。`
         `    propt 弹出，若为数组则试图获取发送者ID在该数组中的消息，_`
         `否则试图获取发送者ID为该数的消息，_`
-        `返回由消息内容，消息ID，消息发送者，消息发送者ID，消息所在频道ID构成的数组。`
+        `返回该消息的信息。`
         `    prompt 弹出二值，若底值为数组则试图获取发送者ID在该数组中的消息，_`
         `否则试图获取发送者ID为该数的消息，对顶值运行 @ 指令，_`
-        `若栈顶为真值则返回……数组，否则继续获取消息。`
+        `若栈顶为真值则返回该消息的信息，否则继续获取消息。`
     ()),
     me : (S
-        `返回由该消息内容，消息ID，消息发送者，消息发送者ID，消息所在频道ID构成的数组。`
+        `返回该消息的信息。`
         `呃不，不是我，是你。`
     ()),
     cat: (S
@@ -185,27 +192,54 @@ const help_record : Record<string, string> = ({
         `    nouts 弹出，取消前(该值)次输出的内容`
         `    nsend 弹出，撤回消息ID为该值的消息`
     ()),
-    "send sends": (S
+    "send sends sendsto": (S
         `如果你需要发送多条消息，也许会挺好用的？`
         `    send 立即发送前一次输出的内容，返回消息ID构成的数组`
         `    sends 弹出，立即发送前(该值)次输出的内容，返回消息ID构成的数组`
+        `    sendsto 弹出二值，在频道ID为底值的频道内 发送前(顶值)次输出的内容，返回消息ID构成的数组`
     ()),
-    msgre: (S
+    getmsg: (S
         `仅对前文管用的消息获取。`
-        `弹出，获取一条满足 (该值.test(内容) || 该值 === 内容) 的消息，_`
-        `并返回由消息内容，消息ID，消息发送者，消息发送者ID，消息所在频道ID构成的数组。`
+        `弹出，对顶值运行 @ 指令，_`
+        `若栈顶为真值则返回该消息的信息，否则继续获取消息。`
+    ()),
+    msgbyid: (S
+        `弹出，获取消息ID为该值的消息，返回该消息的信息。`
     ()),
     sleep: (S
         `弹出，睡死(该值)秒。`
         `你以为呢？`
     ()),
+    "notewc notewd notewe noterc noterd notere": (S
+        `或许是一小块数据库。`
+        `protected 为别人可读不可写，其它……还用我多说吗？`
+        `    notewc 弹出二值，在ID为底值的成员的 public note 写入顶值`
+        `    notewd 弹出，在自己的 protected note 写入该值`
+        `    notewe 弹出，在自己的 private note 写入该值`
+        `    noterc 弹出，读取ID为该值的成员的 public note`
+        `    noterd 弹出，读取ID为该值的成员的 protected note`
+        `    notere 弹出，读取自己的 private note`
+    ()),
+    guildmem: (S
+        `返回近期发过言的所有群成员。`
+        `抽奖 time 😋`
+    ()),
+    "cmd cmdset cmddel cmdall": (S
+        `有见过在QQ里写指令吗？`
+        `放心，这只是 command 的缩写，我不可能把 cmd 真放这里面的。`
+        `调用方式是 '¿¿<name> <arg...>'。参数解析？自己去做啊（ 不`
+        `    cmd 弹出二值，以底值为参，顶值为名，调用 What Commands 的对应指令`
+        `    cmdset 弹出二值，以底值为代码，顶值为名，计入 What Commands `
+        `    cmddel 弹出，以顶值为名删除 What Commands 的对应指令`
+        `    cmdall 返回所有 What Commands 名`
+    ()),
 })
-const help_list : string[] = (Object.keys(help_record)
+export const help_list : string[] = (Object.keys(help_record)
     .join(" ").split(" ")
     .filter((x : string) => /[a-zA-Z][a-zA-Z0-9_]*/.test(x))
 ).sort()
 
-const help : Function = (x : string | undefined) => {
+export const help : Function = (x : string | undefined) => {
     if (!x) {
         return (S
             `WhatLang 为一门大致上基于栈，完全没有任何优势的语言。`
@@ -277,5 +311,3 @@ const help : Function = (x : string | undefined) => {
         return name.replace(/(?<=\b[a-zA-Z][a-zA-Z0-9_]*\b)/g, "@") + "\n\n" + help_record[name]
     }
 }
-
-export {help, help_list}

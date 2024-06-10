@@ -9,7 +9,7 @@ const op : Record<string, (x : any, y : any) => any> = {
 
 const relize = (x : string) => Array.isArray(x) ? new RegExp(x[0], x[1]) : x
 
-var default_var_dict : Record<string, any> = ({
+export var default_var_dict : Record<string, any> = ({
     num: (x : any) => Number(x),
     str: (x : any) => (
       Array.isArray(x) && x.every(i => typeof i == "string" && i.length == 1)
@@ -69,11 +69,13 @@ var default_var_dict : Record<string, any> = ({
     throw: (x : any) => {throw new Error(x)},
     match: (x : any, y : any) => [...x.match(relize(y)) || []],
     repl: (x : any, y : any, z : any) => x.replace(relize(y), z),
+    time: () => Date.now(),
+    type: (x : any) => x.constructor.name,
 })
-var need_svo : string[] = "filter try".split(" ")
-var need_fstack : string[] = "len join reverse stak stack undef".split(" ")
+export var need_svo : string[] = "filter try".split(" ")
+export var need_fstack : string[] = "len join reverse stak stack undef".split(" ")
 
-const formatting : (x : any) => string = (x : any) => {
+export const formatting : (x : any) => string = (x : any) => {
     if (Array.isArray(x)) {
         return "[" + x.map(
             i => Array.isArray(i) && i == x ? "[...]" : formatting(i)
@@ -137,7 +139,7 @@ const repr_formatting : (x : any) => string = (x : any) => {
     return "${" + String(x) + "}"
 }
 
-const exec_what = async (
+export const exec_what = async (
     fstack : any[][], 
     var_dict : Record<string, any>,
     output : (x : any) => void,
@@ -164,7 +166,7 @@ const exec_what = async (
     }
     return stack.at(-1)
 }
-const run_what = async (
+export const run_what = async (
     code : string, 
     var_dict : Record<string, any> = default_var_dict
 ) => {
@@ -180,7 +182,7 @@ const run_what = async (
     })
 }
 
-const eval_what = async (
+export const eval_what = async (
     code : string, fstack : any[][], 
     var_dict : Record<string, any>,
     output : (x : any) => void = (x : any) => console.log(x),
@@ -344,5 +346,3 @@ const eval_what = async (
     }
     return stack.at(-1)
 }
-
-export {formatting, exec_what, eval_what, run_what, default_var_dict, need_svo, need_fstack}
